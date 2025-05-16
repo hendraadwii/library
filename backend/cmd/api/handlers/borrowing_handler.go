@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aksaaaraa/library/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/hendraadwii/library/internal/models"
 )
 
 // BorrowingHandler handles borrowing-related requests
@@ -17,23 +17,23 @@ type BorrowingHandler struct {
 
 // BorrowRequest represents a request to borrow a book
 type BorrowRequest struct {
-	BookID   int64     `json:"book_id" binding:"required"`
-	DueDate  time.Time `json:"due_date" binding:"required"`
+	BookID  int64     `json:"book_id" binding:"required"`
+	DueDate time.Time `json:"due_date" binding:"required"`
 }
 
 // BorrowingResponse represents a borrowing response
 type BorrowingResponse struct {
-	ID         int64        `json:"id"`
-	BookID     int64        `json:"book_id"`
-	UserID     int64        `json:"user_id"`
-	Status     string       `json:"status"`
-	BorrowDate time.Time    `json:"borrow_date"`
-	DueDate    time.Time    `json:"due_date"`
-	ReturnDate *time.Time   `json:"return_date,omitempty"`
-	BookTitle  string       `json:"book_title,omitempty"`
-	BookAuthor string       `json:"book_author,omitempty"`
-	UserName   string       `json:"user_name,omitempty"`
-	UserEmail  string       `json:"user_email,omitempty"`
+	ID         int64      `json:"id"`
+	BookID     int64      `json:"book_id"`
+	UserID     int64      `json:"user_id"`
+	Status     string     `json:"status"`
+	BorrowDate time.Time  `json:"borrow_date"`
+	DueDate    time.Time  `json:"due_date"`
+	ReturnDate *time.Time `json:"return_date,omitempty"`
+	BookTitle  string     `json:"book_title,omitempty"`
+	BookAuthor string     `json:"book_author,omitempty"`
+	UserName   string     `json:"user_name,omitempty"`
+	UserEmail  string     `json:"user_email,omitempty"`
 }
 
 // PaginatedBorrowingsResponse represents a paginated list of borrowings
@@ -433,4 +433,4 @@ func (h *BorrowingHandler) GetMostBorrowedBooks(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, books)
-} 
+}
