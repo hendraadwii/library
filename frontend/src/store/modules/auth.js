@@ -188,6 +188,18 @@ export default {
       return response.data
     },
     
+    // Verify PIN
+    async verifyPin(_, { email, pin }) {
+      const response = await api.post('/auth/verify-pin', { email, pin })
+      return response.data
+    },
+    
+    // Reset password
+    async resetPassword(_, { email, pin, newPassword }) {
+      const response = await api.post('/auth/reset-password', { email, pin, new_password: newPassword })
+      return response.data
+    },
+    
     // Refresh tokens
     async refreshTokens({ commit }) {
       try {
