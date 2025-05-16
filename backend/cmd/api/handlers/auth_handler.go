@@ -1,7 +1,12 @@
 package handlers
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
+	"net/smtp"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hendraadwii/library/internal/auth"
@@ -10,9 +15,10 @@ import (
 
 // AuthHandler handles authentication-related requests
 type AuthHandler struct {
-	UserService  *models.UserService
-	TokenManager *auth.TokenManager
-	RateLimiter  *auth.RateLimiter
+	UserService          *models.UserService
+	TokenManager         *auth.TokenManager
+	RateLimiter          *auth.RateLimiter
+	PasswordResetService *models.PasswordResetService
 }
 
 // LoginRequest represents a login request
@@ -32,6 +38,24 @@ type RegisterRequest struct {
 // RefreshRequest represents a refresh token request
 type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+// ForgotPasswordRequest for forgot password endpoint
+type ForgotPasswordRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+// VerifyPinRequest for verify pin endpoint
+type VerifyPinRequest struct {
+	Email string `json:"email" binding:"required,email"`
+	Pin   string `json:"pin" binding:"required"`
+}
+
+// ResetPasswordRequest for reset password endpoint
+type ResetPasswordRequest struct {
+	Email       string `json:"email" binding:"required,email"`
+	Pin         string `json:"pin" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=6"`
 }
 
 // NewAuthHandler creates a new AuthHandler
@@ -172,4 +196,128 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tokens)
+}
+
+// sendEmail sends an email with the given subject and body to the specified recipient
+func sendEmail(to, subject, body string) error {
+	// SMTP configuration from environment variables
+	from := os.Getenv("SMTP_FROM")
+	password := os.Getenv("SMTP_PASSWORD")
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
+
+	if from == "" || password == "" || smtpHost == "" || smtpPort == "" {
+		return fmt.Errorf("SMTP configuration missing. Please check environment variables: SMTP_FROM, SMTP_PASSWORD, SMTP_HOST, SMTP_PORT")
+	}
+
+	// Compose email
+	msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s", from, to, subject, body)
+
+	// Authentication
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Send email
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, []byte(msg))
+	if err != nil {
+		return fmt.Errorf("failed to send email: %v. Please check your SMTP configuration and make sure you're using an App Password for Gmail", err)
+	}
+
+	// Log success (for debugging)
+	fmt.Printf("Email sent successfully to: %s\n", to)
+	return nil
+}
+
+// ForgotPassword handler
+func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	var req ForgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		return
+	}
+
+	// Generate 6-digit PIN
+	pin := fmt.Sprintf("%06d", rand.Intn(1000000))
+
+	// Set expired time (1 menit dari sekarang)
+	expiredAt := time.Now().Add(1 * time.Minute)
+
+	// Save PIN to database
+	pinData := &models.PasswordResetPin{
+		Email:     req.Email,
+		Pin:       pin,
+		ExpiredAt: expiredAt,
+	}
+	if err := h.PasswordResetService.Create(pinData); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save PIN: " + err.Error()})
+		return
+	}
+
+	// Return PIN in response (for development/testing)
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "PIN berhasil dibuat",
+		"pin":        pin,
+		"expired_at": expiredAt.Format(time.RFC3339),
+	})
+}
+
+// VerifyPin handler
+func (h *AuthHandler) VerifyPin(c *gin.Context) {
+	var req VerifyPinRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		return
+	}
+	pinData, err := h.PasswordResetService.GetByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "PIN tidak ditemukan"})
+		return
+	}
+	if pinData.Pin != req.Pin {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "PIN salah"})
+		return
+	}
+	if time.Now().After(pinData.ExpiredAt) {
+		h.PasswordResetService.DeleteByEmail(req.Email)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "PIN sudah expired"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "PIN valid"})
+}
+
+// ResetPassword handler
+func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	var req ResetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		return
+	}
+	pinData, err := h.PasswordResetService.GetByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "PIN tidak ditemukan"})
+		return
+	}
+	if pinData.Pin != req.Pin {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "PIN salah"})
+		return
+	}
+	if time.Now().After(pinData.ExpiredAt) {
+		h.PasswordResetService.DeleteByEmail(req.Email)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "PIN sudah expired"})
+		return
+	}
+	// Update password user
+	user, err := h.UserService.GetByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User tidak ditemukan"})
+		return
+	}
+	user.Password = req.NewPassword
+	err = h.UserService.Update(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update password: " + err.Error()})
+		return
+	}
+	// Hapus PIN
+	h.PasswordResetService.DeleteByEmail(req.Email)
+	c.JSON(http.StatusOK, gin.H{"message": "Password berhasil direset."})
 }
