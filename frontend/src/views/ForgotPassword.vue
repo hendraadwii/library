@@ -12,7 +12,8 @@
           Forgot Password
         </h2>
         <p class="mt-2 text-sm text-gray-600">
-          Enter your email to reset your password
+          <span v-if="step === 1">Masukkan email untuk reset password</span>
+          <span v-else>Masukkan PIN yang dikirim ke email & password baru</span>
         </p>
       </div>
       
@@ -47,28 +48,47 @@
         </div>
         
         <!-- Email Input -->
-        <div class="space-y-1">
-          <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
+        <div v-if="step === 1">
+          <div class="space-y-1">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                </svg>
+              </div>
+              <input 
+                id="email" 
+                name="email" 
+                type="email" 
+                autocomplete="email" 
+                required 
+                v-model="email"
+                class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                :class="{ 'border-red-500': errors.email }"
+                placeholder="Enter your email"
+              />
             </div>
-            <input 
-              id="email" 
-              name="email" 
-              type="email" 
-              autocomplete="email" 
-              required 
-              v-model="email"
-              class="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
-              :class="{ 'border-red-500': errors.email }"
-              placeholder="Enter your email"
-            />
+            <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
           </div>
-          <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
+        </div>
+        <div v-else>
+          <div class="space-y-1">
+            <label for="pin" class="block text-sm font-medium text-gray-700">PIN (6 digit)</label>
+            <input id="pin" name="pin" type="text" maxlength="6" v-model="pin" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" :class="{ 'border-red-500': errors.pin }" placeholder="Masukkan PIN" />
+            <p v-if="errors.pin" class="mt-1 text-sm text-red-600">{{ errors.pin }}</p>
+          </div>
+          <div class="space-y-1">
+            <label for="newPassword" class="block text-sm font-medium text-gray-700">Password Baru</label>
+            <input id="newPassword" name="newPassword" type="password" v-model="newPassword" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" :class="{ 'border-red-500': errors.newPassword }" placeholder="Password baru" />
+            <p v-if="errors.newPassword" class="mt-1 text-sm text-red-600">{{ errors.newPassword }}</p>
+          </div>
+          <div class="space-y-1">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Konfirmasi Password Baru</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" v-model="confirmPassword" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" :class="{ 'border-red-500': errors.confirmPassword }" placeholder="Konfirmasi password baru" />
+            <p v-if="errors.confirmPassword" class="mt-1 text-sm text-red-600">{{ errors.confirmPassword }}</p>
+          </div>
         </div>
         
         <!-- Submit Button -->
@@ -89,13 +109,13 @@
               </svg>
             </span>
             <span v-if="loading">Processing...</span>
-            <span v-else>Send Reset Link</span>
+            <span v-else>{{ step === 1 ? 'Kirim PIN' : 'Reset Password' }}</span>
           </button>
           
           <p class="mt-4 text-center text-sm text-gray-600">
-            Remember your password?
+            Ingat password?
             <router-link to="/login" class="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out">
-              Back to login
+              Kembali ke login
             </router-link>
           </p>
         </div>
@@ -117,71 +137,107 @@ export default {
     
     // Form data
     const email = ref('')
+    const pin = ref('')
+    const newPassword = ref('')
+    const confirmPassword = ref('')
     const errors = reactive({
-      email: ''
+      email: '',
+      pin: '',
+      newPassword: '',
+      confirmPassword: ''
     })
     
     // States
     const loading = ref(false)
     const errorMessage = ref('')
     const successMessage = ref('')
+    const step = ref(1) // 1: email, 2: pin+password
     
     // Methods
-    const validateForm = () => {
-      let isValid = true
-      
-      // Reset errors
+    const validateEmail = () => {
       errors.email = ''
-      errorMessage.value = ''
-      
-      // Validate email
       if (!email.value) {
         errors.email = 'Email is required'
-        isValid = false
+        return false
       } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email.value)) {
         errors.email = 'Email is invalid'
-        isValid = false
+        return false
       }
-      
-      return isValid
+      return true
     }
-    
+    const validatePinPassword = () => {
+      errors.pin = ''
+      errors.newPassword = ''
+      errors.confirmPassword = ''
+      let valid = true
+      if (!pin.value) {
+        errors.pin = 'PIN wajib diisi'
+        valid = false
+      }
+      if (!newPassword.value) {
+        errors.newPassword = 'Password baru wajib diisi'
+        valid = false
+      } else if (newPassword.value.length < 6) {
+        errors.newPassword = 'Password minimal 6 karakter'
+        valid = false
+      }
+      if (newPassword.value !== confirmPassword.value) {
+        errors.confirmPassword = 'Konfirmasi password tidak sama'
+        valid = false
+      }
+      return valid
+    }
     const handleSubmit = async () => {
-      if (!validateForm()) return
-      
-      loading.value = true
-      
-      try {
-        // Call forgot password action
-        await store.dispatch('auth/forgotPassword', { email: email.value })
-        
-        // Show success message
-        successMessage.value = 'Password reset link has been sent to your email'
-        toast.success('Password reset link sent!')
-        
-        // Clear form
-        email.value = ''
-      } catch (error) {
-        // Set error message
-        if (error.response && error.response.data && error.response.data.error) {
-          errorMessage.value = error.response.data.error
-        } else {
-          errorMessage.value = 'An error occurred. Please try again.'
+      if (step.value === 1) {
+        if (!validateEmail()) return
+        loading.value = true
+        try {
+          await store.dispatch('auth/forgotPassword', { email: email.value })
+          successMessage.value = 'PIN reset password telah dikirim, hubungi admin untuk meminta PIN.'
+          toast.success(successMessage.value)
+          step.value = 2
+        } catch (error) {
+          errorMessage.value = error.response?.data?.error || 'Terjadi kesalahan.'
+          toast.error(errorMessage.value)
+        } finally {
+          loading.value = false
         }
-        
-        // Show error message
-        toast.error(errorMessage.value)
-      } finally {
-        loading.value = false
+      } else if (step.value === 2) {
+        if (!validatePinPassword()) return
+        loading.value = true
+        try {
+          // Verifikasi PIN
+          await store.dispatch('auth/verifyPin', { email: email.value, pin: pin.value })
+          // Reset password
+          await store.dispatch('auth/resetPassword', { email: email.value, pin: pin.value, newPassword: newPassword.value })
+          successMessage.value = 'Password berhasil direset. Silakan login dengan password baru.'
+          toast.success(successMessage.value)
+          // Reset form
+          pin.value = ''
+          newPassword.value = ''
+          confirmPassword.value = ''
+          setTimeout(() => {
+            window.location.href = '/login'
+          }, 2000)
+        } catch (error) {
+          errorMessage.value = error.response?.data?.error || 'PIN salah atau sudah expired.'
+          toast.error(errorMessage.value)
+        } finally {
+          loading.value = false
+        }
       }
     }
     
     return {
       email,
+      pin,
+      newPassword,
+      confirmPassword,
       errors,
       loading,
       errorMessage,
       successMessage,
+      step,
       handleSubmit
     }
   }
