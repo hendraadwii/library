@@ -44,6 +44,12 @@ CREATE TABLE IF NOT EXISTS borrowing_history (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Create password_reset_pins table
+CREATE TABLE password_reset_pins (
+    email VARCHAR(255) PRIMARY KEY,
+    pin VARCHAR(6) NOT NULL,
+    expired_at TIMESTAMP NOT NULL
+);
 -- Add indexes for performance
 CREATE INDEX idx_books_title ON books(title);
 CREATE INDEX idx_books_author ON books(author);
