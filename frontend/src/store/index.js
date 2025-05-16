@@ -4,7 +4,7 @@ import books from './modules/books'
 import borrowings from './modules/borrowings'
 import users from './modules/users'
 
-export default createStore({
+const store = createStore({
   state: {
     loading: false,
     error: null
@@ -41,4 +41,6 @@ export default createStore({
     borrowings,
     users
   }
-}) 
+})
+
+export default store 
