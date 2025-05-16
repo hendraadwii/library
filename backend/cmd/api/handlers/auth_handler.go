@@ -3,9 +3,9 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/aksaaaraa/library/internal/auth"
-	"github.com/aksaaaraa/library/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/hendraadwii/library/internal/auth"
+	"github.com/hendraadwii/library/internal/models"
 )
 
 // AuthHandler handles authentication-related requests
@@ -23,9 +23,9 @@ type LoginRequest struct {
 
 // RegisterRequest represents a registration request
 type RegisterRequest struct {
-	Email    string       `json:"email" binding:"required,email"`
-	Password string       `json:"password" binding:"required,min=6"`
-	FullName string       `json:"full_name" binding:"required"`
+	Email    string          `json:"email" binding:"required,email"`
+	Password string          `json:"password" binding:"required,min=6"`
+	FullName string          `json:"full_name" binding:"required"`
 	Role     models.UserRole `json:"role" binding:"omitempty"`
 }
 
@@ -167,4 +167,4 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tokens)
-} 
+}
