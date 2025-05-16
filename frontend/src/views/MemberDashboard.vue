@@ -10,12 +10,20 @@
       <!-- Responsive Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
         <h2 class="text-2xl font-bold text-gray-900">Daftar Buku</h2>
-        <button
-          @click="logout"
-          class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-        >
-          Logout
-        </button>
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <router-link 
+            to="/member-borrowings"
+            class="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition text-center"
+          >
+            Lihat Buku yang Dipinjam
+          </router-link>
+          <button
+            @click="logout"
+            class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            Logout
+          </button>
+        </div>
       </div>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
