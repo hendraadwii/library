@@ -17,16 +17,25 @@ const (
 	RoleMember UserRole = "member"
 )
 
+// UserStatus represents the status of a user
+type UserStatus string
+
+const (
+	StatusActive UserStatus = "active"
+	StatusLocked UserStatus = "locked"
+)
+
 // User represents a user in the library system
 type User struct {
-	ID           int64     `json:"id"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"-"`                  // Never expose in JSON
-	Password     string    `json:"password,omitempty"` // Only used for input
-	FullName     string    `json:"full_name"`
-	Role         UserRole  `json:"role"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID           int64      `json:"id"`
+	Email        string     `json:"email"`
+	PasswordHash string     `json:"-"`                  // Never expose in JSON
+	Password     string     `json:"password,omitempty"` // Only used for input
+	FullName     string     `json:"full_name"`
+	Role         UserRole   `json:"role"`
+	Status       UserStatus `json:"status"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
 }
 
 // UserService handles user-related database operations
@@ -66,10 +75,15 @@ func (s *UserService) Create(user *User) error {
 	// Clear the plain text password
 	user.Password = ""
 
+	// Set default status to active
+	if user.Status == "" {
+		user.Status = StatusActive
+	}
+
 	query := `
 		INSERT INTO users 
-		(email, password_hash, full_name, role) 
-		VALUES (?, ?, ?, ?)
+		(email, password_hash, full_name, role, status) 
+		VALUES (?, ?, ?, ?, ?)
 	`
 
 	// Use parameterized query to prevent SQL injection
@@ -79,6 +93,7 @@ func (s *UserService) Create(user *User) error {
 		user.PasswordHash,
 		user.FullName,
 		user.Role,
+		user.Status,
 	)
 	if err != nil {
 		return fmt.Errorf("error creating user: %w", err)
@@ -96,7 +111,7 @@ func (s *UserService) Create(user *User) error {
 // GetByID retrieves a user by ID
 func (s *UserService) GetByID(id int64) (*User, error) {
 	query := `
-		SELECT id, email, password_hash, full_name, role, created_at, updated_at 
+		SELECT id, email, password_hash, full_name, role, status, created_at, updated_at 
 		FROM users WHERE id = ?
 	`
 
@@ -107,6 +122,7 @@ func (s *UserService) GetByID(id int64) (*User, error) {
 		&user.PasswordHash,
 		&user.FullName,
 		&user.Role,
+		&user.Status,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -124,7 +140,7 @@ func (s *UserService) GetByID(id int64) (*User, error) {
 // GetByEmail retrieves a user by email
 func (s *UserService) GetByEmail(email string) (*User, error) {
 	query := `
-		SELECT id, email, password_hash, full_name, role, created_at, updated_at 
+		SELECT id, email, password_hash, full_name, role, status, created_at, updated_at 
 		FROM users WHERE email = ?
 	`
 
@@ -135,6 +151,7 @@ func (s *UserService) GetByEmail(email string) (*User, error) {
 		&user.PasswordHash,
 		&user.FullName,
 		&user.Role,
+		&user.Status,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -163,11 +180,12 @@ func (s *UserService) Update(user *User) error {
 
 	query := `
 		UPDATE users 
-		SET full_name = ?, role = ?
+		SET full_name = ?, role = ?, status = ?
 	`
 	params := []interface{}{
 		user.FullName,
 		user.Role,
+		user.Status,
 	}
 
 	// Add password hash to update if it was changed
@@ -223,8 +241,8 @@ func (s *UserService) Delete(id int64) error {
 	return nil
 }
 
-// List returns a list of users with pagination
-func (s *UserService) List(limit, offset int) ([]User, error) {
+// List returns a list of users with pagination and filters
+func (s *UserService) List(limit, offset int, search string, role UserRole, status UserStatus) ([]User, error) {
 	if limit <= 0 {
 		limit = 10 // Default limit
 	}
@@ -234,11 +252,36 @@ func (s *UserService) List(limit, offset int) ([]User, error) {
 	}
 
 	query := `
-		SELECT id, email, password_hash, full_name, role, created_at, updated_at 
-		FROM users ORDER BY id DESC LIMIT ? OFFSET ?
+		SELECT id, email, password_hash, full_name, role, status, created_at, updated_at 
+		FROM users 
+		WHERE 1=1
 	`
+	params := []interface{}{}
 
-	rows, err := s.DB.Query(query, limit, offset)
+	// Add search filter
+	if search != "" {
+		query += " AND (full_name LIKE ? OR email LIKE ?)"
+		searchParam := "%" + search + "%"
+		params = append(params, searchParam, searchParam)
+	}
+
+	// Add role filter
+	if role != "" {
+		query += " AND role = ?"
+		params = append(params, role)
+	}
+
+	// Add status filter
+	if status != "" {
+		query += " AND status = ?"
+		params = append(params, status)
+	}
+
+	// Add order and pagination
+	query += " ORDER BY id DESC LIMIT ? OFFSET ?"
+	params = append(params, limit, offset)
+
+	rows, err := s.DB.Query(query, params...)
 	if err != nil {
 		return nil, fmt.Errorf("error listing users: %w", err)
 	}
@@ -253,6 +296,7 @@ func (s *UserService) List(limit, offset int) ([]User, error) {
 			&user.PasswordHash,
 			&user.FullName,
 			&user.Role,
+			&user.Status,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
@@ -269,10 +313,32 @@ func (s *UserService) List(limit, offset int) ([]User, error) {
 	return users, nil
 }
 
-// Count returns the total number of users
-func (s *UserService) Count() (int, error) {
+// Count returns the total number of users with filters
+func (s *UserService) Count(search string, role UserRole, status UserStatus) (int, error) {
+	query := "SELECT COUNT(*) FROM users WHERE 1=1"
+	params := []interface{}{}
+
+	// Add search filter
+	if search != "" {
+		query += " AND (full_name LIKE ? OR email LIKE ?)"
+		searchParam := "%" + search + "%"
+		params = append(params, searchParam, searchParam)
+	}
+
+	// Add role filter
+	if role != "" {
+		query += " AND role = ?"
+		params = append(params, role)
+	}
+
+	// Add status filter
+	if status != "" {
+		query += " AND status = ?"
+		params = append(params, status)
+	}
+
 	var count int
-	err := s.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
+	err := s.DB.QueryRow(query, params...).Scan(&count)
 	if err != nil {
 		return 0, fmt.Errorf("error counting users: %w", err)
 	}
@@ -285,6 +351,11 @@ func (s *UserService) Authenticate(email, password string) (*User, error) {
 	if err != nil {
 		// Don't reveal that the email doesn't exist
 		return nil, fmt.Errorf("invalid credentials")
+	}
+
+	// Check if user is locked
+	if user.Status == StatusLocked {
+		return nil, fmt.Errorf("account is locked")
 	}
 
 	if !CheckPassword(password, user.PasswordHash) {
