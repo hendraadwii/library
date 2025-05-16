@@ -1,4 +1,4 @@
-module github.com/aksaaaraa/library
+module github.com/hendraadwii/library
 
 go 1.23.0
 
