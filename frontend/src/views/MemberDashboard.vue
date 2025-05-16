@@ -19,7 +19,20 @@
       </div>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <input v-model="search" @input="onSearch" type="text" placeholder="Cari judul/penulis..." class="w-full sm:w-64 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+          <input 
+            v-model="searchTitle" 
+            @input="onSearch" 
+            type="text" 
+            placeholder="Cari judul buku..." 
+            class="w-full sm:w-64 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" 
+          />
+          <input 
+            v-model="searchAuthor" 
+            @input="onSearch" 
+            type="text" 
+            placeholder="Cari nama penulis..." 
+            class="w-full sm:w-64 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" 
+          />
           <select v-model="selectedCategory" @change="onCategoryChange" class="w-full sm:w-48 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
             <option value="">Semua Kategori</option>
             <option value="Fiksi Ilmiah">Fiksi Ilmiah (Science Fiction)</option>
@@ -141,6 +154,15 @@ import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
 import { setupSessionTimeout } from '../utils/sessionTimeout'
 
+// Debounce utility function
+const debounce = (fn, delay) => {
+  let timeoutId
+  return (...args) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
+
 export default {
   name: 'MemberDashboard',
   setup() {
@@ -169,7 +191,8 @@ export default {
       return pages
     })
     const loading = ref(true)
-    const search = ref('')
+    const searchTitle = ref('')
+    const searchAuthor = ref('')
     const selectedCategory = ref('')
     const showDetailModal = ref(false)
     const selectedBook = ref(null)
@@ -179,20 +202,33 @@ export default {
 
     // Filter kategori dan search
     const fetchBooks = async (page = 1) => {
-      loading.value = true
+      loading.value = true;
       try {
-        await store.dispatch('books/getBooks', { page, search: search.value, category: selectedCategory.value })
+        await store.dispatch('books/getBooks', {
+          page,
+          title: searchTitle.value,
+          author: searchAuthor.value,
+          category: selectedCategory.value
+        });
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
+
+    // Create debounced search function
+    const debouncedSearch = debounce(() => {
+      fetchBooks(1)
+    }, 300) // 300ms delay
+
     const changePage = (page) => {
       if (page < 1 || page > totalPages.value) return
       fetchBooks(page)
     }
+
     const onSearch = () => {
-      fetchBooks(1)
+      debouncedSearch()
     }
+
     const onCategoryChange = () => {
       fetchBooks(1)
     }
@@ -248,7 +284,8 @@ export default {
       currentPage,
       pageNumbers,
       loading,
-      search,
+      searchTitle,
+      searchAuthor,
       selectedCategory,
       changePage,
       onSearch,
