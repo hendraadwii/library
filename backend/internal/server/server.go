@@ -75,6 +75,7 @@ func Run() {
 	bookService := models.NewBookService(db)
 	userService := models.NewUserService(db)
 	borrowingService := models.NewBorrowingService(db)
+	passwordResetService := models.NewPasswordResetService(db)
 
 	// Initialize auth components
 	tokenManager := auth.NewTokenManager(toAuthConfig(cfg.Auth))
@@ -87,6 +88,7 @@ func Run() {
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(userService, tokenManager, rateLimiter)
+	authHandler.PasswordResetService = passwordResetService
 	bookHandler := handlers.NewBookHandler(bookService)
 	borrowingHandler := handlers.NewBorrowingHandler(borrowingService, bookService)
 	userHandler := handlers.NewUserHandler(userService)
@@ -101,6 +103,9 @@ func Run() {
 		authRoutes.POST("/login", authHandler.Login)
 		authRoutes.POST("/register", authHandler.Register)
 		authRoutes.POST("/refresh", authHandler.RefreshToken)
+		authRoutes.POST("/forgot-password", authHandler.ForgotPassword)
+		authRoutes.POST("/verify-pin", authHandler.VerifyPin)
+		authRoutes.POST("/reset-password", authHandler.ResetPassword)
 	}
 
 	// Book routes - some with authentication
