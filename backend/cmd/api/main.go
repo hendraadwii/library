@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/aksaaaraa/library/internal/server"
+	"github.com/hendraadwii/library/internal/server"
 )
 
 func main() {
