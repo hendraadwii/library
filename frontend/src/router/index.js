@@ -11,6 +11,7 @@ const BookDetails = () => import('../views/BookDetails.vue')
 const Borrowings = () => import('../views/Borrowings.vue')
 const NotFound = () => import('../views/NotFound.vue')
 const MemberDashboard = () => import('../views/MemberDashboard.vue')
+const Users = () => import('../views/Users.vue')
 
 const routes = [
   {
@@ -61,6 +62,12 @@ const routes = [
     name: 'MemberDashboard',
     component: MemberDashboard,
     meta: { requiresAuth: true, requiresMember: true }
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: Users,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/:pathMatch(.*)*',
