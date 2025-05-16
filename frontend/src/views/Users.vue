@@ -1,19 +1,19 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">User Management</h1>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-800">User Management</h1>
       <button
-        @click="showAddUserModal = true"
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        @click="openAddUserModal"
+        class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
       >
         Add New User
       </button>
     </div>
 
     <!-- Search and Filters -->
-    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
           <input
@@ -63,96 +63,98 @@
 
     <!-- Users Table -->
     <div v-else class="bg-white rounded-lg shadow-md overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ user.email }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                :class="[
-                  'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                  user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
-                ]"
-              >
-                {{ user.role }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                :class="[
-                  'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                  user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                ]"
-              >
-                {{ user.status }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ formatDate(user.last_login) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <div class="flex space-x-2">
-                <button
-                  @click="editUser(user)"
-                  class="text-blue-600 hover:text-blue-900"
-                >
-                  Edit
-                </button>
-                <button
-                  @click="openResetPasswordModal(user)"
-                  class="text-yellow-600 hover:text-yellow-900"
-                >
-                  Reset Password
-                </button>
-                <button
-                  @click="toggleUserStatus(user)"
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">{{ user.full_name }}</div>
+              </td>
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500">{{ user.email }}</div>
+              </td>
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                <span
                   :class="[
-                    user.status === 'active' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'
+                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                    user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'
                   ]"
                 >
-                  {{ user.status === 'active' ? 'Lock' : 'Unlock' }}
-                </button>
-                <button
-                  @click="confirmDeleteUser(user)"
-                  class="text-red-600 hover:text-red-900"
+                  {{ user.role }}
+                </span>
+              </td>
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                <span
+                  :class="[
+                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                    user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  ]"
                 >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatDate(user.created_at) }}
+              </td>
+              <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <button
+                    @click="openEditUserModal(user)"
+                    class="text-indigo-600 hover:text-indigo-900"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    @click="openResetPasswordModal(user)"
+                    class="text-yellow-600 hover:text-yellow-900"
+                  >
+                    Reset Password
+                  </button>
+                  <button
+                    @click="toggleUserStatus(user)"
+                    :class="[
+                      user.status === 'active' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'
+                    ]"
+                  >
+                    {{ user.status === 'active' ? 'Lock' : 'Unlock' }}
+                  </button>
+                  <button
+                    @click="openDeleteModal(user)"
+                    class="text-red-600 hover:text-red-900"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Pagination -->
-      <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-        <div class="flex-1 flex justify-between sm:hidden">
+      <div class="bg-white px-2 sm:px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
+        <div class="w-full sm:w-auto flex justify-between sm:hidden">
           <button
             @click="changePage(currentPage - 1)"
             :disabled="currentPage === 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
           <button
             @click="changePage(currentPage + 1)"
             :disabled="currentPage === totalPages"
-            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
@@ -172,31 +174,17 @@
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
               <button
-                @click="changePage(currentPage - 1)"
-                :disabled="currentPage === 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                Previous
-              </button>
-              <button
                 v-for="page in displayedPages"
                 :key="page"
                 @click="changePage(page)"
                 :class="[
-                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                  'relative inline-flex items-center px-3 sm:px-4 py-2 border text-sm font-medium',
                   page === currentPage
-                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                 ]"
               >
                 {{ page }}
-              </button>
-              <button
-                @click="changePage(currentPage + 1)"
-                :disabled="currentPage === totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                Next
               </button>
             </nav>
           </div>
@@ -206,18 +194,19 @@
 
     <!-- Add/Edit User Modal -->
     <div v-if="showAddUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="relative top-10 sm:top-20 mx-auto p-4 sm:p-5 border w-full sm:w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
             {{ editingUser ? 'Edit User' : 'Add New User' }}
           </h3>
-          <form @submit.prevent="submitUserForm">
+          <form @submit.prevent="saveUser">
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
               <input
                 v-model="userForm.name"
                 type="text"
                 required
+                minlength="2"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -227,6 +216,7 @@
                 v-model="userForm.email"
                 type="email"
                 required
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -247,20 +237,23 @@
                 v-model="userForm.password"
                 type="password"
                 required
+                minlength="6"
+                pattern="(?=.*\d).{6,}"
+                title="Password must be at least 6 characters long and contain at least one number"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div class="flex justify-end space-x-3">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 type="button"
                 @click="showAddUserModal = false"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
               >
                 {{ editingUser ? 'Update' : 'Create' }}
               </button>
@@ -272,30 +265,33 @@
 
     <!-- Reset Password Modal -->
     <div v-if="showResetPasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="relative top-10 sm:top-20 mx-auto p-4 sm:p-5 border w-full sm:w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Reset Password</h3>
-          <form @submit.prevent="submitResetPassword">
+          <form @submit.prevent="resetPassword">
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
               <input
                 v-model="resetPasswordForm.password"
                 type="password"
                 required
+                minlength="6"
+                pattern="(?=.*\d).{6,}"
+                title="Password must be at least 6 characters long and contain at least one number"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div class="flex justify-end space-x-3">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 type="button"
                 @click="showResetPasswordModal = false"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
               >
                 Reset Password
               </button>
@@ -307,22 +303,22 @@
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="relative top-10 sm:top-20 mx-auto p-4 sm:p-5 border w-full sm:w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Confirm Delete</h3>
           <p class="text-sm text-gray-500 mb-4">
-            Are you sure you want to delete user "{{ userToDelete?.name }}"? This action cannot be undone.
+            Are you sure you want to delete user "{{ userToDelete?.full_name }}"? This action cannot be undone.
           </p>
-          <div class="flex justify-end space-x-3">
+          <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
             <button
               @click="showDeleteModal = false"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+              class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
             >
               Cancel
             </button>
             <button
               @click="deleteUser"
-              class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
+              class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
             >
               Delete
             </button>
@@ -393,7 +389,7 @@ export default {
 
     // Methods
     const fetchUsers = () => {
-      store.dispatch('users/fetchUsers', {
+      store.dispatch('users/getUsers', {
         page: currentPage.value,
         perPage: perPage.value,
         search: search.value,
@@ -406,16 +402,14 @@ export default {
       fetchUsers()
     }, 300)
 
-    const onSearch = () => {
-      debouncedSearch()
-    }
-
-    const onRoleFilterChange = () => {
-      fetchUsers()
-    }
-
-    const onStatusFilterChange = () => {
-      fetchUsers()
+    const formatDate = (dateString) => {
+      if (!dateString) return '-'
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
     }
 
     const openAddUserModal = () => {
@@ -429,7 +423,7 @@ export default {
 
     const openEditUserModal = (user) => {
       editingUser.value = user
-      userForm.name = user.name
+      userForm.name = user.full_name
       userForm.email = user.email
       userForm.role = user.role
       userForm.password = ''
@@ -468,7 +462,7 @@ export default {
 
     const resetPassword = async () => {
       try {
-        await store.dispatch('users/resetPassword', {
+        await store.dispatch('users/resetUserPassword', {
           userId: resetPasswordForm.userId,
           password: resetPasswordForm.password
         })
@@ -492,7 +486,10 @@ export default {
 
     const toggleUserStatus = async (user) => {
       try {
-        await store.dispatch('users/toggleUserStatus', user.id)
+        await store.dispatch('users/toggleUserStatus', {
+          userId: user.id,
+          currentStatus: user.status
+        })
         toast.success(`User ${user.status === 'active' ? 'locked' : 'unlocked'} successfully`)
         fetchUsers()
       } catch (error) {
@@ -534,9 +531,9 @@ export default {
       displayedPages,
 
       // Methods
-      onSearch,
-      onRoleFilterChange,
-      onStatusFilterChange,
+      fetchUsers,
+      debouncedSearch,
+      formatDate,
       openAddUserModal,
       openEditUserModal,
       openResetPasswordModal,
@@ -549,4 +546,4 @@ export default {
     }
   }
 }
-</script> 
+</script>
