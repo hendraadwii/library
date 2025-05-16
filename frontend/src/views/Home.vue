@@ -11,6 +11,7 @@
           <router-link to="/" class="text-gray-700 hover:text-indigo-600 text-sm font-medium">Dashboard</router-link>
           <router-link to="/books" class="text-gray-700 hover:text-indigo-600 text-sm font-medium">Books</router-link>
           <router-link to="/borrowings" class="text-gray-700 hover:text-indigo-600 text-sm font-medium">Borrowings</router-link>
+          <router-link to="/users" class="text-gray-700 hover:text-indigo-600 text-sm font-medium">Users</router-link>
           <button @click="logout" class="ml-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-medium">Logout</button>
         </div>
         <!-- Mobile Hamburger -->
@@ -32,6 +33,7 @@
             <router-link @click="showDropdown = false" to="/" class="text-gray-700 hover:text-indigo-600 text-base font-medium">Dashboard</router-link>
             <router-link @click="showDropdown = false" to="/books" class="text-gray-700 hover:text-indigo-600 text-base font-medium">Books</router-link>
             <router-link @click="showDropdown = false" to="/borrowings" class="text-gray-700 hover:text-indigo-600 text-base font-medium">Borrowings</router-link>
+            <router-link @click="showDropdown = false" to="/users" class="text-gray-700 hover:text-indigo-600 text-base font-medium">Users</router-link>
             <button @click="logout" class="w-full text-left px-2 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-base font-medium">Logout</button>
           </div>
         </div>
