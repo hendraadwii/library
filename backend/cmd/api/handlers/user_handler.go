@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/aksaaaraa/library/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/hendraadwii/library/internal/models"
 )
 
 type UserHandler struct {
