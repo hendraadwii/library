@@ -344,13 +344,13 @@ func (h *BorrowingHandler) GetOverdueBooks(c *gin.Context) {
 
 	// Parse pagination parameters
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "1000"))
 
 	if page < 1 {
 		page = 1
 	}
-	if perPage < 1 || perPage > 100 {
-		perPage = 10
+	if perPage < 1 {
+		perPage = 1000
 	}
 
 	// Calculate offset
@@ -433,4 +433,93 @@ func (h *BorrowingHandler) GetMostBorrowedBooks(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, books)
+}
+
+// GetMemberBorrowings handles retrieval of borrowings for the current member
+// @Summary Get member borrowings
+// @Description Get borrowings for the currently authenticated member
+// @Tags borrowings
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number (default: 1)"
+// @Param per_page query int false "Items per page (default: 10)"
+// @Success 200 {object} PaginatedBorrowingsResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Security BearerAuth
+// @Router /borrowings/member [get]
+func (h *BorrowingHandler) GetMemberBorrowings(c *gin.Context) {
+	// Get user ID from context (set by auth middleware)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	// Parse pagination parameters
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 {
+		perPage = 10
+	}
+
+	// Calculate offset
+	offset := (page - 1) * perPage
+
+	// Create filters
+	filters := models.BorrowingFilters{
+		UserID: userID.(int64),
+		Limit:  perPage,
+		Offset: offset,
+	}
+
+	// Get borrowings from database
+	borrowings, err := h.BorrowingService.List(filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting borrowings: " + err.Error()})
+		return
+	}
+
+	// Get total count for pagination
+	totalCount, err := h.BorrowingService.Count(filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error counting borrowings: " + err.Error()})
+		return
+	}
+
+	// Calculate total pages
+	totalPages := totalCount / perPage
+	if totalCount%perPage > 0 {
+		totalPages++
+	}
+
+	// Map to response format
+	var borrowingResponses []BorrowingResponse
+	for _, borrowing := range borrowings {
+		borrowingResponses = append(borrowingResponses, BorrowingResponse{
+			ID:         borrowing.ID,
+			BookID:     borrowing.BookID,
+			UserID:     borrowing.UserID,
+			Status:     string(borrowing.Status),
+			BorrowDate: borrowing.BorrowDate,
+			DueDate:    borrowing.DueDate,
+			ReturnDate: borrowing.ReturnDate,
+			BookTitle:  borrowing.BookTitle,
+			BookAuthor: borrowing.BookAuthor,
+			UserName:   borrowing.UserName,
+			UserEmail:  borrowing.UserEmail,
+		})
+	}
+
+	c.JSON(http.StatusOK, PaginatedBorrowingsResponse{
+		Borrowings: borrowingResponses,
+		TotalCount: totalCount,
+		Page:       page,
+		PerPage:    perPage,
+		TotalPages: totalPages,
+	})
 }
