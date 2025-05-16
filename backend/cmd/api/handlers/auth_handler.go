@@ -66,6 +66,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	// Authenticate user
 	user, err := h.UserService.Authenticate(req.Email, req.Password)
 	if err != nil {
+		if err.Error() == "account is locked" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Your account has been locked. Please contact the administrator."})
+			return
+		}
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
