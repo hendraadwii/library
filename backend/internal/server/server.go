@@ -133,6 +133,12 @@ func Run() {
 	userRoutes := api.Group("/users")
 	userRoutes.Use(authMiddleware.AuthRequired(), authMiddleware.RoleRequired(string(models.RoleAdmin)))
 	{
+		userRoutes.GET("", userHandler.GetUsers)
+		userRoutes.POST("", userHandler.CreateUser)
+		userRoutes.PUT("/:id", userHandler.UpdateUser)
+		userRoutes.DELETE("/:id", userHandler.DeleteUser)
+		userRoutes.PUT("/:id/password", userHandler.ResetUserPassword)
+		userRoutes.PUT("/:id/status", userHandler.ToggleUserStatus)
 		userRoutes.GET("/count", userHandler.GetUserCount)
 	}
 
