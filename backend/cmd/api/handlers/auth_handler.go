@@ -55,6 +55,7 @@ func NewAuthHandler(userService *models.UserService, tokenManager *auth.TokenMan
 // @Failure 401 {object} ErrorResponse
 // @Failure 429 {object} ErrorResponse "Too many requests"
 // @Router /auth/login [post]
+
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
