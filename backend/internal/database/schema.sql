@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     role ENUM('admin', 'member') DEFAULT 'member',
+    status ENUM('active', 'locked') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -48,6 +49,7 @@ CREATE INDEX idx_books_title ON books(title);
 CREATE INDEX idx_books_author ON books(author);
 CREATE INDEX idx_borrowing_status ON borrowing_history(status);
 CREATE INDEX idx_borrowing_dates ON borrowing_history(borrow_date, due_date, return_date);
+CREATE INDEX idx_users_status ON users(status);
 
 -- Example parameterized query for book insertion (for documentation)
 -- INSERT INTO books (title, author, stock, isbn, published_year, category, description) 
