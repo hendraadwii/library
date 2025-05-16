@@ -74,7 +74,12 @@ const actions = {
     commit('SET_USERS_ERROR', null)
     try {
       const api = getAPI()
-      const response = await api.post('/users', userData)
+      const response = await api.post('/users', {
+        email: userData.email,
+        password: userData.password,
+        full_name: userData.name,
+        role: userData.role
+      })
       commit('ADD_USER', response.data)
       return response.data
     } catch (error) {
@@ -91,7 +96,11 @@ const actions = {
     commit('SET_USERS_ERROR', null)
     try {
       const api = getAPI()
-      const response = await api.put(`/users/${id}`, userData)
+      const response = await api.put(`/users/${id}`, {
+        email: userData.email,
+        full_name: userData.name,
+        role: userData.role
+      })
       commit('UPDATE_USER', response.data)
       return response.data
     } catch (error) {
@@ -124,7 +133,7 @@ const actions = {
     commit('SET_USERS_ERROR', null)
     try {
       const api = getAPI()
-      await api.post(`/users/${userId}/reset-password`, { password })
+      await api.put(`/users/${userId}/password`, { password })
     } catch (error) {
       commit('SET_USERS_ERROR', error.response?.data?.error || error.message)
       throw error
@@ -134,12 +143,13 @@ const actions = {
   },
 
   // Toggle user status (lock/unlock)
-  async toggleUserStatus({ commit }, { userId, status }) {
+  async toggleUserStatus({ commit }, { userId, currentStatus }) {
     commit('SET_USERS_LOADING', true)
     commit('SET_USERS_ERROR', null)
     try {
       const api = getAPI()
-      const response = await api.put(`/users/${userId}/status`, { status })
+      const newStatus = currentStatus === 'active' ? 'locked' : 'active'
+      const response = await api.put(`/users/${userId}/status`, { status: newStatus })
       commit('UPDATE_USER', response.data)
       return response.data
     } catch (error) {
@@ -157,7 +167,7 @@ const actions = {
     try {
       const api = getAPI()
       const response = await api.get('/users/count')
-      commit('SET_TOTAL_MEMBERS', response.data.count)
+      commit('SET_TOTAL_MEMBERS', response.data.total_users)
       return response.data
     } catch (error) {
       commit('SET_USERS_ERROR', error.response?.data?.error || error.message)
