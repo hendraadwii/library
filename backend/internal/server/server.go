@@ -127,6 +127,7 @@ func Run() {
 		borrowingRoutes.POST("", borrowingHandler.BorrowBook)
 		borrowingRoutes.POST("/:id/return", borrowingHandler.ReturnBook)
 		borrowingRoutes.GET("/overdue", borrowingHandler.GetOverdueBooks)
+		borrowingRoutes.GET("/member", borrowingHandler.GetMemberBorrowings)
 	}
 
 	// User routes - admin only
