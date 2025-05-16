@@ -4,7 +4,7 @@ A fullstack Library Management System built with Vue.js (frontend) and Go (backe
 
 ---
 
-## Project Structure
+## Project Structure ##
 
 ```
 ├── backend/
