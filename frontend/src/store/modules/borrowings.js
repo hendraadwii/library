@@ -9,7 +9,8 @@ export default {
     currentPage: 1,
     perPage: 10,
     totalPages: 0,
-    overdueBorrowings: []
+    overdueBorrowings: [],
+    currentUserId: null
   },
   mutations: {
     SET_BORROWINGS(state, { borrowings, totalCount, page, perPage, totalPages }) {
@@ -23,6 +24,9 @@ export default {
       state.borrowing = borrowing
     },
     ADD_BORROWING(state, borrowing) {
+      if (!Array.isArray(state.borrowings)) {
+        state.borrowings = [];
+      }
       state.borrowings.unshift(borrowing)
     },
     UPDATE_BORROWING(state, updatedBorrowing) {
@@ -36,6 +40,15 @@ export default {
     },
     SET_OVERDUE(state, borrowings) {
       state.overdueBorrowings = borrowings
+    },
+    SET_BORROWINGS_LOADING(state, loading) {
+      state.loading = loading
+    },
+    SET_BORROWINGS_ERROR(state, error) {
+      state.error = error
+    },
+    SET_CURRENT_USER_ID(state, userId) {
+      state.currentUserId = userId
     }
   },
   actions: {
@@ -131,6 +144,32 @@ export default {
         console.error('Error fetching overdue borrowings:', error)
         throw error
       }
+    },
+    
+    // Get borrowings for current member
+    async getMemberBorrowings({ commit }) {
+      commit('SET_BORROWINGS_LOADING', true)
+      commit('SET_BORROWINGS_ERROR', null)
+      try {
+        const api = getAPI()
+        // Ambil data dengan perPage besar agar tidak dibatasi 10
+        const response = await api.get('/borrowings/member', {
+          params: { per_page: 1000, page: 1 }
+        })
+        commit('SET_BORROWINGS', {
+          borrowings: response.data.borrowings,
+          totalCount: response.data.total_count,
+          page: response.data.page,
+          perPage: response.data.per_page,
+          totalPages: response.data.total_pages
+        })
+        return response.data
+      } catch (error) {
+        commit('SET_BORROWINGS_ERROR', error.response?.data?.error || error.message)
+        throw error
+      } finally {
+        commit('SET_BORROWINGS_LOADING', false)
+      }
     }
   },
   getters: {
@@ -151,6 +190,9 @@ export default {
     // Get borrowings by book ID
     borrowingsByBook: state => bookId => {
       return state.borrowings.filter(b => b.book_id === bookId)
-    }
+    },
+    
+    // Get borrowings for current member
+    memberBorrowings: (state) => state.borrowings
   }
 } 
