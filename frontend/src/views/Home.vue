@@ -51,10 +51,11 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span>Loading...</span>
+        <span>Memuat data...</span>
       </div>
 
       <div v-else>
+        <div v-if="errorMsg" class="text-center text-red-500 py-4">{{ errorMsg }}</div>
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div class="bg-white rounded-lg shadow p-2 sm:p-4 flex items-center w-full">
@@ -118,8 +119,8 @@
             <h2 class="text-base sm:text-lg font-semibold text-gray-800">Most Borrowed Books</h2>
           </div>
           <div class="p-2 sm:p-4 overflow-x-auto">
-            <div v-if="mostBorrowedBooks.length === 0" class="text-center text-gray-500 py-4">
-              No data available
+            <div v-if="Array.isArray(mostBorrowedBooks) && mostBorrowedBooks.length === 0" class="text-center text-gray-500 py-4">
+              Belum ada data buku yang sering dipinjam.
             </div>
             <div v-else>
               <table class="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
@@ -158,8 +159,8 @@
             <h2 class="text-base sm:text-lg font-semibold text-gray-800">Overdue Books</h2>
           </div>
           <div class="p-2 sm:p-4 overflow-x-auto">
-            <div v-if="overdueBorrowings.length === 0" class="text-center text-gray-500 py-4">
-              No overdue books
+            <div v-if="Array.isArray(overdueBorrowings) && overdueBorrowings.length === 0" class="text-center text-gray-500 py-4">
+              Tidak ada buku yang terlambat dikembalikan.
             </div>
             <div v-else>
               <table class="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
@@ -213,6 +214,7 @@ export default {
     const mostBorrowedBooks = ref([])
     const overdueBorrowings = ref([])
     const showDropdown = ref(false)
+    const errorMsg = ref('')
     
     // Setup session timeout
     const { resetTimer, setupActivityListeners, cleanup } = setupSessionTimeout(3)
@@ -300,6 +302,7 @@ export default {
     // Load data on component mount
     onMounted(async () => {
       loading.value = true
+      errorMsg.value = ''
       try {
         await Promise.all([
           fetchBooks(),
@@ -313,7 +316,8 @@ export default {
         resetTimer()
       } catch (error) {
         console.error('Error loading dashboard data:', error)
-        toast.error('Failed to load dashboard data')
+        errorMsg.value = error.response?.data?.error || error.message || 'Gagal memuat data dashboard.'
+        toast.error('Gagal memuat data dashboard: ' + errorMsg.value)
       } finally {
         loading.value = false
       }
@@ -345,7 +349,8 @@ export default {
       totalMembers,
       usersLoading,
       usersError,
-      userRole
+      userRole,
+      errorMsg
     }
   }
 }
