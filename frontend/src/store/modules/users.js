@@ -3,6 +3,7 @@ import { getAPI } from '../../utils/api'
 const state = {
   users: [],
   totalUsers: 0,
+  totalMembers: 0,
   currentPage: 1,
   perPage: 10,
   totalPages: 0,
@@ -17,6 +18,9 @@ const mutations = {
     state.currentPage = page
     state.perPage = perPage
     state.totalPages = totalPages
+  },
+  SET_TOTAL_MEMBERS(state, total) {
+    state.totalMembers = total
   },
   SET_USERS_LOADING(state, loading) {
     state.loading = loading
@@ -181,6 +185,7 @@ const actions = {
 const getters = {
   allUsers: state => state.users,
   totalUsers: state => state.totalUsers,
+  totalMembers: state => state.totalMembers,
   currentPage: state => state.currentPage,
   perPage: state => state.perPage,
   totalPages: state => state.totalPages,
