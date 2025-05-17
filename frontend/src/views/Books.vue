@@ -82,6 +82,22 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-if="loading" class="hover:bg-gray-50">
+                <td colspan="5" class="px-6 py-4 text-center">
+                  <div class="flex justify-center items-center">
+                    <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="ml-2">Loading...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="books.length === 0" class="hover:bg-gray-50">
+                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                  No books found
+                </td>
+              </tr>
               <tr v-for="book in books" :key="book.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
@@ -549,40 +565,39 @@ export default {
     const saveBook = async () => {
       if (!validateForm()) return
       try {
+        const formData = new FormData()
+        formData.append('title', bookForm.title)
+        formData.append('author', bookForm.author)
+        formData.append('isbn', bookForm.isbn)
+        formData.append('category', bookForm.category)
+        formData.append('description', bookForm.description)
+        formData.append('stock', bookForm.stock)
+        
+        // Append cover file if it exists
+        if (coverFile.value) {
+          formData.append('cover', coverFile.value)
+        }
+
         if (showEditBookModal.value) {
-          // Update existing book with cover if provided
-          const formData = new FormData()
-          formData.append('title', bookForm.title)
-          formData.append('author', bookForm.author)
-          formData.append('isbn', bookForm.isbn)
-          formData.append('category', bookForm.category)
-          formData.append('description', bookForm.description)
-          formData.append('stock', bookForm.stock)
-          if (coverFile.value) {
-            formData.append('cover', coverFile.value)
-          }
           await store.dispatch('books/updateBook', {
             bookId: bookForm.id,
             bookData: formData
           })
           toast.success('Book updated successfully')
         } else {
-          // Create new book with cover
-          const formData = new FormData()
-          formData.append('title', bookForm.title)
-          formData.append('author', bookForm.author)
-          formData.append('isbn', bookForm.isbn)
-          formData.append('category', bookForm.category)
-          formData.append('description', bookForm.description)
-          formData.append('stock', bookForm.stock)
-          if (coverFile.value) {
-            formData.append('cover', coverFile.value)
-          }
           await store.dispatch('books/createBook', formData)
           toast.success('Book created successfully')
         }
+        
+        // Reset form and close modal
         cancelBookModal()
-        await store.dispatch('books/getBooks', { page: currentPage.value })
+        // Refresh the book list
+        await store.dispatch('books/getBooks', { 
+          page: currentPage.value,
+          title: filters.title,
+          author: filters.author,
+          category: filters.category
+        })
       } catch (error) {
         toast.error((error.response?.data?.error || error.message))
       }
