@@ -66,8 +66,8 @@
     <div v-else>
       <!-- Books Table -->
       <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div v-if="books.length === 0" class="text-center text-gray-500 py-8">
-          No books found
+        <div v-if="Array.isArray(books) && books.length === 0" class="text-center text-gray-500 py-8">
+          Tidak ada buku ditemukan
         </div>
         <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
