@@ -108,7 +108,7 @@ func (s *BookService) Update(book *Book) error {
 	query := `
 		UPDATE books 
 		SET title = ?, author = ?, stock = ?, isbn = ?, 
-		    published_year = ?, category = ?, description = ? 
+		    published_year = ?, category = ?, description = ?, cover = ? 
 		WHERE id = ?
 	`
 
@@ -121,6 +121,7 @@ func (s *BookService) Update(book *Book) error {
 		book.PublishedYear,
 		book.Category,
 		book.Description,
+		book.Cover,
 		book.ID,
 	)
 	if err != nil {
