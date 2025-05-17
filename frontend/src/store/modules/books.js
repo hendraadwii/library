@@ -13,7 +13,7 @@ export default {
   },
   mutations: {
     SET_BOOKS(state, { books, totalCount, page, perPage, totalPages }) {
-      state.books = books
+      state.books = Array.isArray(books) ? books : []
       state.totalBooks = totalCount
       state.currentPage = page
       state.perPage = perPage
@@ -147,7 +147,7 @@ export default {
     }
   },
   getters: {
-    allBooks: state => state.books,
+    allBooks: state => Array.isArray(state.books) ? state.books : [],
     bookById: state => id => state.books.find(book => book.id === id),
     currentBook: state => state.book,
     totalBooks: state => state.totalBooks,
