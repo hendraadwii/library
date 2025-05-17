@@ -14,7 +14,7 @@ export default {
   },
   mutations: {
     SET_BORROWINGS(state, { borrowings, totalCount, page, perPage, totalPages }) {
-      state.borrowings = borrowings
+      state.borrowings = Array.isArray(borrowings) ? borrowings : []
       state.totalBorrowings = totalCount
       state.currentPage = page
       state.perPage = perPage
@@ -173,7 +173,7 @@ export default {
     }
   },
   getters: {
-    allBorrowings: state => state.borrowings,
+    allBorrowings: state => Array.isArray(state.borrowings) ? state.borrowings : [],
     borrowingById: state => id => state.borrowings.find(b => b.id === id),
     currentBorrowing: state => state.borrowing,
     totalBorrowings: state => state.totalBorrowings,
