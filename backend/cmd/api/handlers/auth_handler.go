@@ -199,7 +199,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 }
 
 // sendEmail sends an email with the given subject and body to the specified recipient
-func sendEmail(to, subject, body string) error {
+func SendEmail(to, subject, body string) error {
 	// SMTP configuration from environment variables
 	from := os.Getenv("SMTP_FROM")
 	password := os.Getenv("SMTP_PASSWORD")
