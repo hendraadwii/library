@@ -57,94 +57,70 @@
       <div v-else>
         <div v-if="errorMsg" class="text-center text-red-500 py-4">{{ errorMsg }}</div>
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div class="bg-white rounded-lg shadow p-2 sm:p-4 flex items-center w-full">
-            <div class="bg-blue-100 rounded-full p-2 sm:p-3 mr-2 sm:mr-4">
-              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4V7a4 4 0 00-8 0v2m8 4a4 4 0 01-8 0" />
-              </svg>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-gradient-to-r from-indigo-100 to-indigo-200 rounded-xl shadow p-5 flex items-center transition hover:shadow-lg hover:-translate-y-1 duration-200">
+            <div class="bg-indigo-500 text-white rounded-full p-4 mr-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4V7a4 4 0 00-8 0v2m8 4a4 4 0 01-8 0" /></svg>
             </div>
             <div>
-              <p class="text-gray-500 text-xs sm:text-sm">Total Members</p>
-              <p class="text-lg sm:text-2xl font-semibold">
-                <template v-if="userRole === 'admin'">
-                  <span v-if="usersLoading">Loading...</span>
-                  <span v-else-if="usersError" class="text-red-500">{{ usersError }}</span>
-                  <span v-else>{{ totalMembers !== null ? totalMembers : 0 }}</span>
-                </template>
-                <template v-else>
-                  <span class="text-gray-400">Hanya admin yang dapat melihat</span>
-                </template>
-              </p>
+              <p class="text-gray-600 text-xs">Total Members</p>
+              <p class="text-2xl font-bold">{{ totalMembers }}</p>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow p-2 sm:p-4 flex items-center w-full">
-            <div class="bg-indigo-100 rounded-full p-2 sm:p-3 mr-2 sm:mr-4">
-              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-              </svg>
+          <div class="bg-gradient-to-r from-purple-100 to-purple-200 rounded-xl shadow p-5 flex items-center transition hover:shadow-lg hover:-translate-y-1 duration-200">
+            <div class="bg-purple-500 text-white rounded-full p-4 mr-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             </div>
             <div>
-              <p class="text-gray-500 text-xs sm:text-sm">Total Books</p>
-              <p class="text-lg sm:text-2xl font-semibold">{{ totalBooks }}</p>
+              <p class="text-gray-600 text-xs">Total Books</p>
+              <p class="text-2xl font-bold">{{ totalBooks }}</p>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow p-2 sm:p-4 flex items-center w-full">
-            <div class="bg-green-100 rounded-full p-2 sm:p-3 mr-2 sm:mr-4">
-              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+          <div class="bg-gradient-to-r from-green-100 to-green-200 rounded-xl shadow p-5 flex items-center transition hover:shadow-lg hover:-translate-y-1 duration-200">
+            <div class="bg-green-500 text-white rounded-full p-4 mr-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div>
-              <p class="text-gray-500 text-xs sm:text-sm">Active Borrowings</p>
-              <p class="text-lg sm:text-2xl font-semibold">{{ activeBorrowings }}</p>
+              <p class="text-gray-600 text-xs">Active Borrowings</p>
+              <p class="text-2xl font-bold">{{ activeBorrowings }}</p>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow p-2 sm:p-4 flex items-center w-full">
-            <div class="bg-red-100 rounded-full p-2 sm:p-3 mr-2 sm:mr-4">
-              <svg class="h-5 w-5 sm:h-6 sm:w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+          <div class="bg-gradient-to-r from-red-100 to-red-200 rounded-xl shadow p-5 flex items-center transition hover:shadow-lg hover:-translate-y-1 duration-200">
+            <div class="bg-red-500 text-white rounded-full p-4 mr-4">
+              <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div>
-              <p class="text-gray-500 text-xs sm:text-sm">Overdue Books</p>
-              <p class="text-lg sm:text-2xl font-semibold">{{ overdueBorrowings.length }}</p>
+              <p class="text-gray-600 text-xs">Overdue Books</p>
+              <p class="text-2xl font-bold">{{ overdueBorrowings.length }}</p>
             </div>
           </div>
         </div>
-
         <!-- Most Borrowed Books -->
-        <div class="bg-white rounded-lg shadow mb-6 sm:mb-8">
-          <div class="border-b px-2 sm:px-4 py-2 sm:py-4">
-            <h2 class="text-base sm:text-lg font-semibold text-gray-800">Most Borrowed Books</h2>
+        <div class="bg-white rounded-xl shadow mb-8 overflow-x-auto">
+          <div class="border-b pb-2 mb-4 flex items-center">
+            <h2 class="text-lg font-semibold text-gray-800">Most Borrowed Books</h2>
           </div>
-          <div class="p-2 sm:p-4 overflow-x-auto">
+          <div class="p-2 sm:p-4">
             <div v-if="Array.isArray(mostBorrowedBooks) && mostBorrowedBooks.length === 0" class="text-center text-gray-500 py-4">
               Belum ada data buku yang sering dipinjam.
             </div>
             <div v-else>
-              <table class="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
+              <table class="min-w-full divide-y divide-gray-200 rounded-xl overflow-hidden">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Author</th>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Borrow Count</th>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Author</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Borrow Count</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="book in mostBorrowedBooks" :key="book.id">
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                      <div class="font-medium text-gray-900">{{ book.title }}</div>
-                    </td>
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                      <div class="text-gray-500">{{ book.author }}</div>
-                    </td>
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                      <div class="text-gray-500">{{ book.borrow_count }}</div>
-                    </td>
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap font-medium">
-                      <router-link :to="`/books/${book.id}`" class="text-indigo-600 hover:text-indigo-900">View</router-link>
+                <tbody>
+                  <tr v-for="book in mostBorrowedBooks" :key="book.id" class="odd:bg-gray-50">
+                    <td class="px-6 py-4 font-medium">{{ book.title }}</td>
+                    <td class="px-6 py-4">{{ book.author }}</td>
+                    <td class="px-6 py-4">{{ book.borrow_count }}</td>
+                    <td class="px-6 py-4 font-medium">
+                      <router-link :to="`/books/${book.id}`" class="text-indigo-600 hover:text-indigo-900 transition">View</router-link>
                     </td>
                   </tr>
                 </tbody>
@@ -152,39 +128,32 @@
             </div>
           </div>
         </div>
-
         <!-- Overdue Borrowings -->
-        <div class="bg-white rounded-lg shadow">
-          <div class="border-b px-2 sm:px-4 py-2 sm:py-4">
-            <h2 class="text-base sm:text-lg font-semibold text-gray-800">Overdue Books</h2>
+        <div class="bg-white rounded-xl shadow overflow-x-auto">
+          <div class="border-b pb-2 mb-4 flex items-center">
+            <h2 class="text-lg font-semibold text-gray-800">Overdue Books</h2>
           </div>
-          <div class="p-2 sm:p-4 overflow-x-auto">
+          <div class="p-2 sm:p-4">
             <div v-if="Array.isArray(overdueBorrowings) && overdueBorrowings.length === 0" class="text-center text-gray-500 py-4">
               Tidak ada buku yang terlambat dikembalikan.
             </div>
             <div v-else>
-              <table class="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
+              <table class="min-w-full divide-y divide-gray-200 rounded-xl overflow-hidden">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Book</th>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Days Overdue</th>
-                    <th scope="col" class="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Book</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Due Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Days Overdue</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="borrowing in overdueBorrowings" :key="borrowing.id">
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                      <div class="font-medium text-gray-900">{{ borrowing.book_title }}</div>
-                    </td>
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                      <div class="text-gray-500">{{ formatDate(borrowing.due_date) }}</div>
-                    </td>
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                      <div class="text-red-500 font-medium">{{ getDaysOverdue(borrowing.due_date) }} days</div>
-                    </td>
-                    <td class="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap font-medium">
-                      <button @click="returnBook(borrowing.id)" class="text-indigo-600 hover:text-indigo-900">Return</button>
+                <tbody>
+                  <tr v-for="borrowing in overdueBorrowings" :key="borrowing.id" class="odd:bg-gray-50">
+                    <td class="px-6 py-4 font-medium">{{ borrowing.book_title }}</td>
+                    <td class="px-6 py-4">{{ formatDate(borrowing.due_date) }}</td>
+                    <td class="px-6 py-4 text-red-500 font-semibold">{{ getDaysOverdue(borrowing.due_date) }} days</td>
+                    <td class="px-6 py-4 font-medium">
+                      <button @click="returnBook(borrowing.id)" class="text-indigo-600 hover:text-indigo-900 transition">Return</button>
                     </td>
                   </tr>
                 </tbody>
