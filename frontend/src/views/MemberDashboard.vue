@@ -64,33 +64,31 @@
           </div>
         </div>
         <template v-else>
-          <div v-if="books.length === 0" class="col-span-full text-center py-8">
-            <div class="text-gray-500">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-              </svg>
-              <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada buku ditemukan</h3>
-              <p class="mt-1 text-sm text-gray-500">Coba sesuaikan pencarian atau filter untuk menemukan buku yang Anda cari.</p>
-            </div>
+          <div v-if="books.length === 0" class="col-span-full flex flex-col items-center justify-center py-12">
+            <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            <h3 class="mt-2 text-lg font-semibold text-gray-900">Tidak ada buku ditemukan</h3>
+            <p class="mt-1 text-sm text-gray-500 text-center">Coba sesuaikan pencarian atau filter untuk menemukan buku yang Anda cari.</p>
           </div>
-          <div v-else v-for="book in books" :key="book.id" class="bg-white rounded-xl shadow-lg p-4 flex flex-col transition hover:shadow-2xl hover:-translate-y-1 duration-200 group">
-            <div class="relative">
-              <img v-if="book.cover" :src="getCoverUrl(book.cover)" alt="Cover" class="h-44 w-full object-cover rounded-lg mb-3 cursor-pointer transition group-hover:scale-105 duration-200" @click="showBookDetail(book)" />
-              <div v-else class="h-44 w-full bg-gray-200 rounded-lg mb-3 flex items-center justify-center text-gray-400 text-4xl cursor-pointer" @click="showBookDetail(book)">
-                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <div v-else v-for="book in books" :key="book.id" class="bg-white rounded-2xl shadow-lg p-5 flex flex-col transition hover:shadow-2xl hover:-translate-y-1 duration-200 group relative">
+            <div class="relative mb-3">
+              <img v-if="book.cover" :src="getCoverUrl(book.cover)" alt="Cover" class="h-48 w-full object-cover rounded-xl cursor-pointer transition group-hover:scale-105 duration-200" @click="showBookDetail(book)" />
+              <div v-else class="h-48 w-full bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-4xl cursor-pointer" @click="showBookDetail(book)">
+                <svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
               </div>
               <span v-if="book.stock === 0" class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded shadow">Out of Stock</span>
               <span v-if="isNewBook(book)" class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded shadow animate-pulse">Baru</span>
             </div>
-            <div class="flex-1">
-              <h2 class="text-lg font-semibold text-gray-900 mb-1 cursor-pointer transition group-hover:text-indigo-700" @click="showBookDetail(book)">{{ book.title }}</h2>
-              <p class="text-xs text-gray-500 mb-1">Author: <span class="font-medium text-gray-700">{{ book.author }}</span></p>
-              <p class="text-xs text-gray-500 mb-1">Category: <span class="font-medium text-gray-700">{{ book.category }}</span></p>
+            <div class="flex-1 flex flex-col">
+              <h2 class="text-lg font-bold text-gray-900 mb-1 cursor-pointer transition group-hover:text-indigo-700" @click="showBookDetail(book)">{{ book.title }}</h2>
+              <p class="text-xs text-gray-500 mb-1">Penulis: <span class="font-medium text-gray-700">{{ book.author }}</span></p>
+              <p class="text-xs text-gray-500 mb-1">Kategori: <span class="font-medium text-gray-700">{{ book.category }}</span></p>
               <p class="text-xs text-gray-500 mb-1">ISBN: <span class="font-medium text-gray-700">{{ book.isbn }}</span></p>
-              <p class="text-xs text-gray-500 mb-2">Stock: <span :class="book.stock > 0 ? 'text-green-600' : 'text-red-600'">{{ book.stock > 0 ? book.stock : 'Out of Stock' }}</span></p>
+              <p class="text-xs text-gray-500 mb-2">Stok: <span :class="book.stock > 0 ? 'text-green-600' : 'text-red-600'">{{ book.stock > 0 ? book.stock : 'Out of Stock' }}</span></p>
             </div>
             <button 
-              class="mt-2 w-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white py-2 rounded-lg font-semibold shadow hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              class="mt-3 w-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white py-2 rounded-xl font-semibold shadow hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="book.stock <= 0 || borrowingLoading[book.id]"
               @click="borrowBook(book)"
             >
